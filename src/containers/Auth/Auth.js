@@ -1,13 +1,19 @@
 import React from 'react';
 import './Auth.css'
-import Button from './../../components/Button/Button'
-import {Input} from './../../components/Input/Input'
+import Button from '../../components/UI/Button/Button'
+import {Input} from '../../components/UI/Input/Input'
 
 
+
+function validateEmail(email) {
+  const re = /^(([^<>()\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
 export class Auth extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isFormValid: false,
       formControls: {
         email: {
           value: '',
@@ -49,7 +55,29 @@ export class Auth extends React.Component {
   }
 
   validateControl(value, validationOption) {
+    // если не передали объект настроек валдиации validationOption, то верни true
+    if (!validationOption) {
+      return true;
+    }
 
+    let isValid = true;
+
+    if (validationOption.required) {
+      // если значение value не равно пустой строке, то  isValid = true
+      isValid = value !== ''
+    }
+
+    if (validationOption.email) {
+      // если функция с регулярным выражением вернула true по value и до этого все проверки прошли успешно, то isValid = true
+      isValid = validateEmail(value) && isValid
+    }
+
+    if (validationOption.minLength) {
+      // если длина value больше чем в настройках и до этого все проверки прошли успешно, то isValid = true
+      isValid = value.length >= validationOption.minLength && isValid
+    }
+
+    return isValid;
   }
 
 
@@ -69,8 +97,17 @@ export class Auth extends React.Component {
     // обновляем локальную копию formControls по имени контрола controlName
     formControls[controlName] = control;
 
+    let isFormValid = true;
+    // получаем объект ключей объекта formControls: email и password и дальше с помощью forEach пробегаемся по каждому
+    Object.keys(formControls).forEach(name => {
+      // если у каждого инпута valid === true и до этого isFormValid был равен true => isFormValid = true
+      isFormValid = formControls[name].valid && isFormValid
+    })
+
+
     this.setState({
-      formControls: formControls
+      formControls: formControls,
+      isFormValid: isFormValid
     })
 
   }
@@ -114,6 +151,8 @@ export class Auth extends React.Component {
             <Button
               type="success"
               onClick={this.loginHandler}
+              // блокируем кнопку если форма невалидна
+              disabled={!this.state.isFormValid}
             >
               Войти
             </Button>
