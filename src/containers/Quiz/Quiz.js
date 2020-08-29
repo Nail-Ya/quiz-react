@@ -98,11 +98,11 @@ class Quiz extends React.Component {
       results[question.id] = 'error'
       // добавить в стейт error ответ неверный
       this.setState({
+
         answerState: {[answerId]: 'error'},
         results: results
       })
     }
-
 
 
   }
