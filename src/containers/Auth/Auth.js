@@ -2,7 +2,7 @@ import React from 'react';
 import './Auth.css'
 import Button from '../../components/UI/Button/Button'
 import {Input} from '../../components/UI/Input/Input'
-
+import axios from 'axios'
 
 
 function validateEmail(email) {
@@ -42,12 +42,37 @@ export class Auth extends React.Component {
       }
     }
   }
-  loginHandler = () => {
 
+  // залогиниться войти в систему
+  loginHandler = () => {
+    const authData = {
+      email: this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken: true
+    }
+    axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDs7PMIc1Bp2RWfMtuj9bomRxEx1IgayVA', authData)
+    .then(res => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.log(err);
+    })
   }
 
+  // зарегестрироваться в системе
   registerHandler = () => {
-
+    const authData = {
+      email: this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken: true
+    }
+    axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDs7PMIc1Bp2RWfMtuj9bomRxEx1IgayVA', authData)
+    .then(res => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.log(err);
+    })
   }
 
   submitHandler = (evt) => {
@@ -55,7 +80,7 @@ export class Auth extends React.Component {
   }
 
   validateControl(value, validationOption) {
-    // если не передали объект настроек валдиации validationOption, то верни true
+    // если не передали объект настроек валидации validationOption, то верни true
     if (!validationOption) {
       return true;
     }
@@ -82,12 +107,12 @@ export class Auth extends React.Component {
 
 
   onChangeHandler = (evt, controlName) => {
-    console.log(controlName);
+
 
     // создаем копию стейта formControls
     const formControls = {...this.state.formControls}
 
-    // создаем копию нужного контрола (объект email или password), оператор spread для того чтобы объект control не переопределялся и был независимым
+    // создаем копию нужного контрола (инпута) (объект email или password), оператор spread для того чтобы объект control не переопределялся и был независимым
     const control = {...formControls[controlName]}
 
     control.value = evt.target.value;
@@ -103,7 +128,6 @@ export class Auth extends React.Component {
       // если у каждого инпута valid === true и до этого isFormValid был равен true => isFormValid = true
       isFormValid = formControls[name].valid && isFormValid
     })
-
 
     this.setState({
       formControls: formControls,

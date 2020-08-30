@@ -2,11 +2,15 @@ import React from 'react';
 import './Quiz.css'
 import ActiveQuiz from './../../components/ActiveQuiz/ActiveQuiz'
 import FinishedQuiz from './../../components/FinishedQuiz/FinishedQuiz'
+import axios from 'axios'
+import {Loader} from './../../components/UI/Loader/Loader'
+import {withRouter} from 'react-router-dom'
 
 class Quiz extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
+      loading: true,
       results: {}, // {[id]: succeess or error}
       isFinished: false,
       activeQuestion: 0,
@@ -37,6 +41,25 @@ class Quiz extends React.Component {
       ]
     }
   }
+
+  // загружаем конкретный тест по динамическому id
+  componentDidMount() {
+    //this.props.match.params.id - id quiz-а
+    axios.get(`https://react-quiz-15b82.firebaseio.com/quizes/${this.props.match.params.id}.json`)
+    .then(res => {
+      const quiz = res.data;
+
+      this.setState({
+        quiz: quiz,
+        loading: false
+      })
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
+
+
 
   onAnswerClickHandler = (answerId) => {
     // чтобы нельзя было прокликать быстро все вопросы с первым правильным ответом
@@ -122,34 +145,37 @@ class Quiz extends React.Component {
   }
 
   render() {
+
+
     return(
 
       <div className="Quiz">
 
 
         <div className="QuizWrapper">
-        <h1>Ответьте на вопросы</h1>
-        {
-          this.state.isFinished
-          ? <FinishedQuiz
-              results={this.state.results}
-              quiz={this.state.quiz}
-              onRetry={this.retryHandler}
-            />
-          : <ActiveQuiz
-              answers={this.state.quiz[this.state.activeQuestion].answers}
-              question={this.state.quiz[this.state.activeQuestion].question}
-              onAnswerClick={this.onAnswerClickHandler}
-              quizLength={this.state.quiz.length}
-              answerNumber={this.state.activeQuestion + 1}
-              state={this.state.answerState}
-            />
-        }
-
+          <h1>Ответьте на вопросы</h1>
+          {
+            this.state.loading
+            ? <Loader />
+            : this.state.isFinished
+                ? <FinishedQuiz
+                    results={this.state.results}
+                    quiz={this.state.quiz}
+                    onRetry={this.retryHandler}
+                  />
+                : <ActiveQuiz
+                    answers={this.state.quiz[this.state.activeQuestion].answers}
+                    question={this.state.quiz[this.state.activeQuestion].question}
+                    onAnswerClick={this.onAnswerClickHandler}
+                    quizLength={this.state.quiz.length}
+                    answerNumber={this.state.activeQuestion + 1}
+                    state={this.state.answerState}
+                  />
+          }
         </div>
       </div>
     )
   }
 }
 
-export default Quiz;
+export default withRouter(Quiz);

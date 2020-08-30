@@ -13,7 +13,20 @@ export const Select = props => {
         id={htmlFor}
         value={props.value}
         onChange={props.onChange}
-      ></select>
+      >
+        {
+          props.options.map((option, index) => {
+            return (
+              <option
+                value={option.value}
+                key={option.value + index}
+              >
+                {option.text}
+              </option>
+            )
+          })
+        }
+      </select>
     </div>
   )
 }
