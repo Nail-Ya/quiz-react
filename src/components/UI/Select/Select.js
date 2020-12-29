@@ -1,21 +1,27 @@
 import React from 'react';
-import './Select.css'
+import './Select.css';
 
 export const Select = props => {
-// id selecta
-  const htmlFor = `${props.label}-${Math.random()}`
+  const {
+    label,
+    value,
+    onChange,
+    options,
+  } = props;
 
+  // id selecta
+  const htmlFor = `${label}-${Math.random()}`
 
   return (
     <div className="Select">
-      <label htmlFor={htmlFor}>{props.label}</label>
+      <label htmlFor={htmlFor}>{label}</label>
       <select
         id={htmlFor}
-        value={props.value}
-        onChange={props.onChange}
+        value={value}
+        onChange={onChange}
       >
         {
-          props.options.map((option, index) => {
+          options.map((option, index) => {
             return (
               <option
                 value={option.value}

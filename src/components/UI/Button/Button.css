@@ -10,6 +10,18 @@
   font-size: 12px;
 }
 
+@media screen and (max-width: 424px){
+  .Button {
+    padding: 10px 5px;
+    margin-right: 10px;
+  }
+
+  .Button:nth-of-type(2) {
+    padding: 10px 5px;
+    margin: 0;
+  }
+}
+
 .Button:focus {
   outline: none;
 }

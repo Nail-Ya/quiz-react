@@ -26,19 +26,33 @@
 
 .Drawer ul li {
   margin-bottom: 15px;
+  display: block;
+  background: #fff;
+  border: 1px solid #566270;
+  border-radius: 5px;
+  transition: transform 0.2s ease-in-out;
 }
+
+.Drawer ul li:hover {
+  transform: scale(1.02)
+}
+
+
+
+
+
 
 .Drawer ul li a {
   color: #363d55;
   font-size: 30px;
   text-decoration: none;
-  background-color: #fff;
+  /* background-color: #fff; */
   position: relative;
   padding: 0 20px 10px 20px;
   transition: opacity .2s;
 }
 
-.Drawer ul li a:hover, .active {
-  opacity: .6;
+.Drawer ul li a .active {
+  opacity: .9;
 }
 
