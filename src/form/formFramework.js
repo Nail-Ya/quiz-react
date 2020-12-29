@@ -16,18 +16,12 @@ export function validate(value, validation = null) {
   let isValid = true;
 
   if (validation.required) {
-  // если значение value не равно пустой строке, то  isValid = true
-  isValid = value !== ''
+    // если значение value не равно пустой строке, то  isValid = true
+    isValid = value !== ''
   }
-
-
   return isValid;
-
-
 }
 
-
-//сюда добавить object.keys
 export function validateForm(formControls) {
   let isFormValid = true
   // если все инпуты валидны, то форма будет валидной
@@ -35,5 +29,4 @@ export function validateForm(formControls) {
     isFormValid = formControls[control].valid && isFormValid
   }
   return isFormValid;
-
 }

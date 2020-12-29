@@ -1,26 +1,34 @@
 import React from 'react';
 import './ActiveQuiz.css'
 import './ActiveQuiz';
-import AnswersList from './AnswersList/AnswersList'
+import AnswersList from './AnswersList/AnswersList';
 
-const ActiveQuiz = props => (
-  <div className="ActiveQuiz">
-    <p className="Question">
-      <span>
-        <strong>{props.answerNumber}.</strong>&nbsp;
-        {props.question}
-      </span>
+const ActiveQuiz = props => {
+  const {
+    answerNumber,
+    question,
+    quizLength,
+    answers,
+    onAnswerClick,
+    state
+  } = props;
 
-      <small>{props.answerNumber} из {props.quizLength}</small>
-    </p>
-
-
-    <AnswersList
-      answers={props.answers}
-      onAnswerClick={props.onAnswerClick}
-      state={props.state}
-    />
-  </div>
-)
+  return (
+    <div className="ActiveQuiz">
+      <p className="Question">
+        <span>
+          <strong>{answerNumber}.</strong>&nbsp;
+          {question}
+        </span>
+        <small>{answerNumber} из {quizLength}</small>
+      </p>
+      <AnswersList
+        answers={answers}
+        onAnswerClick={onAnswerClick}
+        state={state}
+      />
+    </div>
+  )
+}
 
 export default ActiveQuiz;
