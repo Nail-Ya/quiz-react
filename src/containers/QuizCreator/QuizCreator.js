@@ -1,10 +1,11 @@
 import React from 'react';
-import './QuizCreator.css'
-import Button from '../../components/UI/Button/Button'
-import {Input} from '../../components/UI/Input/Input'
-import {Select} from '../../components/UI/Select/Select'
-import {createControl, validate, validateForm} from './../../form/formFramework'
-import axios from 'axios'
+import './QuizCreator.css';
+import Button from '../../components/UI/Button/Button';
+import { Input } from '../../components/UI/Input/Input';
+import { Select } from '../../components/UI/Select/Select';
+import { createControl, validate, validateForm } from './../../form/formFramework';
+import { connect } from 'react-redux';
+import { createQuizQuestionActionCreator, finishCreateQuizActionCreator } from './../../store/actions/create';
 
 function createOptionControl(number) {
   return createControl({
@@ -34,12 +35,10 @@ function createFormControls() {
   }
 }
 
-
-export class QuizCreator extends React.Component {
+class QuizCreator extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      quiz: [],
       isFormValid: false,
       rightAnswerId: 1,
       formControls: createFormControls()
@@ -49,14 +48,10 @@ export class QuizCreator extends React.Component {
   submitHandler = event => {
     event.preventDefault();
   }
+
   // добавляем новые вопросы на страницу
   addQuestionHandler = event => {
     event.preventDefault();
-
-    // создаем локальную купию массива quiz из стейта
-    const quiz = this.state.quiz.concat()
-    // index для id
-    const index = quiz.length + 1
 
     //деструктуризация объекта this.state.formControls на составляющие
     const {question, option1, option2, option3, option4} = this.state.formControls;
@@ -64,7 +59,7 @@ export class QuizCreator extends React.Component {
     //объект каждого из вопросов и положить их в массив quiz
     const questionItem = {
       question: question.value,
-      id: index,
+      id: this.props.quiz.length + 1,
       rightAnswerId: this.state.rightAnswerId,
       answers: [
         {text: option1.value, id: option1.id},
@@ -75,82 +70,50 @@ export class QuizCreator extends React.Component {
     }
 
     // добавляем вопрос в quiz
-    quiz.push(questionItem);
+    this.props.createQuizQuestion(questionItem);
 
     // обновляем стейт и обнуляем страницу
     this.setState({
-      quiz: quiz,
       isFormValid: false,
       rightAnswerId: 1,
       formControls: createFormControls()
     })
-
-
-
   }
   // отправка пост запроса на сервер с помощью библиотеки axios для добавления нового вопроса в базу данных на сервере
   createQuizHandler = (event) => {
     event.preventDefault();
-
-
-
-    axios.post('https://react-quiz-15b82.firebaseio.com/quizes.json', this.state.quiz)
-      .then(res => {
-
-        // обновляем стейт страницы для того чтобы можно было ввести новый запрос
-        this.setState({
-          quiz: [],
-          isFormValid: false,
-          rightAnswerId: 1,
-          formControls: createFormControls()
-        })
-
-
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    this.setState({
+      isFormValid: false,
+      rightAnswerId: 1,
+      formControls: createFormControls()
+    })
+    this.props.finishCreateQuiz()
   }
 
   changeHandler = (value, controlName) => {
-
     // создаем копию стейта formControls
     const formControls = {...this.state.formControls}
-//console.log(formControls)
     // создаем копию нужного контрола (инпута) (объект question или option1/2/3/4), оператор spread для того чтобы объект control не переопределялся и был независимым
     const control = {...formControls[controlName]}
-
     control.touched = true
     control.value = value
     control.valid = validate(control.value, control.validation)
-
     // обновляем локальную копию formControls по имени контрола controlName
     formControls[controlName] = control
-
-
-
     this.setState({
       formControls: formControls,
       isFormValid: validateForm(formControls)
     })
-
-
-
-
   }
-
-
 
   renderControls() {
     // методом Object.keys получаем массив ключей объекта this.state.formControls (получаем question, option1/2/3/4) и дальше map-ом
     return Object.keys(this.state.formControls).map((controlName, index) => {
       // control это объект question или option1/2/3/4
       const control = this.state.formControls[controlName]
-
       return (
         <div key={index}>
           <Input
-
             label={control.label}
             value={control.value}
             valid={control.valid}
@@ -160,7 +123,7 @@ export class QuizCreator extends React.Component {
             errorMessage={control.errorMessage}
             onChange={evt => this.changeHandler(evt.target.value, controlName)}
           />
-          { index === 0 && <hr/> }
+          { index === 0 && <hr /> }
         </div>
       )
     })
@@ -185,19 +148,14 @@ export class QuizCreator extends React.Component {
       ]}
     />
     return(
-
       <div className="QuizCreator">
         <div className="wrapper">
           <h1>Создание теста</h1>
-
           <form onSubmit={this.submitHandler}>
-
             {
               this.renderControls()
             }
-
             {select}
-
             <Button
               type="primary"
               onClick={this.addQuestionHandler}
@@ -206,25 +164,32 @@ export class QuizCreator extends React.Component {
             >
               Добавить вопрос
             </Button>
-
             <Button
               type="success"
               onClick={this.createQuizHandler}
               //disabled пока нету никаких вопросов
-              disabled={this.state.quiz.length === 0}
+              disabled={this.props.quiz.length === 0}
             >
               Создать тест
             </Button>
-
-
-
           </form>
-
-
-
         </div>
-
       </div>
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    quiz: state.create.quiz
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    createQuizQuestion: (item) => dispatch(createQuizQuestionActionCreator(item)),
+    finishCreateQuiz: () => dispatch(finishCreateQuizActionCreator())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizCreator)

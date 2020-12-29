@@ -16,3 +16,9 @@
 .MenuToggle.open {
   left: 320px;
 }
+
+@media screen and (max-width: 350px){
+  .MenuToggle.open {
+    left: 280px;
+  }
+}

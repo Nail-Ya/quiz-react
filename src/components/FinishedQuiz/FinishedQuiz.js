@@ -1,13 +1,18 @@
 import React from 'react';
-import './FinishedQuiz.css'
-import Button from './../UI/Button/Button'
-import {Link} from 'react-router-dom'
+import './FinishedQuiz.css';
+import Button from './../UI/Button/Button';
+import { Link } from 'react-router-dom';
 
 const FinishedQuiz = props => {
+  const {
+    results,
+    quiz,
+    onRetry
+  } = props;
 
   // количество правильных ответов
-  const successAnswerCount = Object.keys(props.results).reduce((total, key) => {
-    if (props.results[key] === 'success') {
+  const successAnswerCount = Object.keys(results).reduce((total, key) => {
+    if (results[key] === 'success') {
       total++
     }
     return total
@@ -17,12 +22,12 @@ const FinishedQuiz = props => {
     <div className="FinishedQuiz">
       <ul>
         {
-          props.quiz.map((quizItem, index) => {
+          quiz.map((quizItem, index) => {
 
             const classNameArray = [
               'fa',
-              props.results[quizItem.id] === 'error' ? 'fa-times' : 'fa-check',
-              props.results[quizItem.id]
+              results[quizItem.id] === 'error' ? 'fa-times' : 'fa-check',
+              results[quizItem.id]
             ]
 
             return (
@@ -36,16 +41,13 @@ const FinishedQuiz = props => {
             )
           })
         }
-
       </ul>
-
-      <p>Правильно {successAnswerCount} из {props.quiz.length}</p>
+      <p>Правильно {successAnswerCount} из {quiz.length}</p>
       <div>
-        <Button onClick={props.onRetry} type="primary">Повторить</Button>
+        <Button onClick={onRetry} type="primary">Повторить</Button>
         <Link to="/">
           <Button type="success">Список тестов</Button>
         </Link>
-
       </div>
     </div>
   )
